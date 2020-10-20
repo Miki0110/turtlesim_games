@@ -11,7 +11,7 @@ int randomNumber(int maxN, int minN){
 
     int randomNumber = rand() % (maxN-minN+1) + minN;
 
-    ROS_INFO("Random number: %d", randomNumber);
+    //ROS_INFO("Random number: %d", randomNumber);
     return randomNumber;
 }
 void initTurtlePosition(float x, float y, ros::ServiceClient teleport_client, ros::ServiceClient pen_client, turtlesim::TeleportAbsolute srv, turtlesim::SetPen pen_srv){
@@ -35,7 +35,6 @@ int main(int argc, char *argv[]) {
   ros::init(argc, argv, "draw_turtle");
   ros::NodeHandle nh;
   ros::service::waitForService("/turtle1/teleport_absolute", -1);
-  ros::service::waitForService("clear", -1);
   ros::ServiceClient teleport_client = nh.serviceClient<turtlesim::TeleportAbsolute>("/turtle1/teleport_absolute");
   turtlesim::TeleportAbsolute srv;
   ros::ServiceClient pen_client = nh.serviceClient<turtlesim::SetPen>("/turtle1/set_pen");
@@ -53,41 +52,49 @@ int main(int argc, char *argv[]) {
 
   const int sizeCoordA = 5;
   const int sizeCoordB = 2;
+  int coordinatesX[sizeCoordA+1];
+  int coordinatesY[sizeCoordA+1];
 
-    int coordinatesX[sizeCoordA];
-    int coordinatesY[sizeCoordA];
-
-    for(int i=0; i<sizeCoordA; i++){
+for(int i=0; i<sizeCoordA+1; i++){
         coordinatesX[i] = randomNumber(10, 3);
         ros::Duration(1.0).sleep();
         coordinatesY[i] = randomNumber(10, 3);
         ros::Duration(1.0).sleep();
     }
+std::sort(coordinatesX, coordinatesX + sizeCoordA);
+std::sort(coordinatesY, coordinatesY + sizeCoordA);
+  for(int i=0; i<sizeCoordA+1; i++){
+std::cout << "(" << coordinatesX[i] << ", " << coordinatesY[i] << ") ";
+  }
 
+//for calculating the angle
+for(int i=0; i<sizeCoordA+1; i++){
+double x_distance = coordinatesX[i] - coordinatesX[i-1];
+double y_distance = coordinatesY[i] - coordinatesY[i-1];
+double header = atan2(y_distance, x_distance);
+double angular_difference = header * 180 / M_PI;
 
-  std::sort(coordinatesX, coordinatesX + sizeCoordA);
-  std::sort(coordinatesY, coordinatesY + sizeCoordA);
-
-    for(int i=0; i<sizeCoordA+1; i++){
-    
-
-    if (i = 0){
-    initTurtlePosition(coordinatesX[i], coordinatesY[i],teleport_client, pen_client, srv, pen_srv);
-    loop_rate.sleep();
-    }
-    if (i < sizeCoordA != 0){
-    std::cout << "(" << coordinatesX[i] << ", " << coordinatesY[i] << ") ";
-    srv.request.x = coordinatesX[i];
-    srv.request.y = coordinatesY[i];
-    teleport_client.call(srv);
-    loop_rate.sleep();
-    } else {
+ROS_INFO("\nAngle: %f", angular_difference);
+}
+    for(int i=0; i<sizeCoordA+2; i++){
+  if (i == 0)
+  {
+  initTurtlePosition(coordinatesX[i], coordinatesY[i],teleport_client, pen_client, srv, pen_srv);
+  loop_rate.sleep();
+  }
+  
+  else if(i == sizeCoordA+1){
     srv.request.x = coordinatesX[0];
     srv.request.y = coordinatesY[0];
     teleport_client.call(srv);
     loop_rate.sleep();
-    }
-    
+  }    
+  else {
+    srv.request.x = coordinatesX[i];
+    srv.request.y = coordinatesY[i];
+    teleport_client.call(srv);
+    loop_rate.sleep();
+  }
   }
 
    /*
