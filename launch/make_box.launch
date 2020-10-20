@@ -1,0 +1,4 @@
+<launch>
+    <node name="simulator" pkg="turtlesim" type="turtlesim_node" />
+    <node name="boxer" pkg="turtlesim_games" type="make_box" />
+</launch>
