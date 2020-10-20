@@ -136,7 +136,7 @@ add_executable(make_box src/make_box.cpp)
 add_executable(vacuum src/vacuum.cpp)
 add_executable(move_turtle src/move_turtle.cpp)
 add_executable(draw_turtle src/draw_turtle.cpp)
-add_executable(sutden123 src/sutden123.cpp)
+add_executable(sutden src/sutden.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -169,7 +169,7 @@ target_link_libraries(draw_turtle
   ${catkin_LIBRARIES}
 )
 
-target_link_libraries(sutden123
+target_link_libraries(sutden
   ${catkin_LIBRARIES}
 )
 
@@ -189,7 +189,7 @@ target_link_libraries(sutden123
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS kill_turtles make_box vacuum move_turtle draw_turtle sutden123
+install(TARGETS kill_turtles make_box vacuum move_turtle draw_turtle sutden
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
