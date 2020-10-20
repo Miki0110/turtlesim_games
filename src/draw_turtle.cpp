@@ -31,6 +31,29 @@ void moveTurtle(float x, float y, ros::ServiceClient teleport_client, turtlesim:
   teleport_client.call(srv);
 }
 
+bool itIntersects(int max_angle,int x1, int y1, int x2, int y2){
+
+        double x_distance = x1 - x2;
+        double y_distance = y1 - y2;
+        double header = atan2(y_distance, x_distance);
+        double angular_difference = header * 180 / M_PI;
+  ROS_INFO("\nAngle: %f", angular_difference);
+  if (angular_difference < max_angle && angular_difference > -max_angle)
+  {
+    return false;
+  }
+  else
+  {
+    return true;
+  }
+}
+void swapValue(int val1, int val2){
+    int temp = val1;
+    val1 = val2;
+    val2 = temp;
+}
+
+
 int main(int argc, char *argv[]) {
   ros::init(argc, argv, "draw_turtle");
   ros::NodeHandle nh;
@@ -53,16 +76,42 @@ int main(int argc, char *argv[]) {
   const int sizeCoordA = 5;
   const int sizeCoordB = 2;
   int coordinatesX[sizeCoordA+1];
-  int coordinatesY[sizeCoordA+1];
+  int coordinatesY[sizeCoordA+1]; 
 
 for(int i=0; i<sizeCoordA+1; i++){
-        coordinatesX[i] = randomNumber(10, 3);
-        ros::Duration(1.0).sleep();
-        coordinatesY[i] = randomNumber(10, 3);
-        ros::Duration(1.0).sleep();
+  coordinatesX[i] = randomNumber(10, 3);
+  ros::Duration(1.0).sleep();
+  coordinatesY[i] = randomNumber(10, 3);
+  ros::Duration(1.0).sleep();
     }
-std::sort(coordinatesX, coordinatesX + sizeCoordA);
-std::sort(coordinatesY, coordinatesY + sizeCoordA);
+    bool fullIntersect = true;
+while (fullIntersect == true)
+{
+
+for(int i=0; i<sizeCoordA+1; i++){
+  
+  int intersection = itIntersects(130, coordinatesX[i], coordinatesY[i], coordinatesX[i-1], coordinatesY[i-1]);
+  
+  if (intersection = true){
+    swapValue(coordinatesX[i], coordinatesX[i-1]);
+    swapValue(coordinatesY[i], coordinatesY[i-1]);
+    ROS_INFO("\nsortting");
+  }
+    }
+
+fullIntersect = false;
+for(int i=0; i<sizeCoordA; i++){
+  //std::cout << "(" << coordinatesX[i] << ", " << coordinatesY[i] << ") ";
+  int intersection = itIntersects(130, coordinatesX[i], coordinatesY[i], coordinatesX[i+1], coordinatesY[i+1]);
+  
+  if (intersection = true){
+    fullIntersect = true;
+    ROS_INFO("\nfailed sort");
+  }
+}
+}
+/*std::sort(coordinatesX, coordinatesX + sizeCoordA);
+std::sort(coordinatesY, coordinatesY + sizeCoordA);*/
   for(int i=0; i<sizeCoordA+1; i++){
 std::cout << "(" << coordinatesX[i] << ", " << coordinatesY[i] << ") ";
   }
