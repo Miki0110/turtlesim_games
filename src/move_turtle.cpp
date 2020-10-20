@@ -33,13 +33,17 @@ std::cout << "\nPlease choose a shape";
 std::cout << "\nSquare = 1";
 std::cout << "\nCircle = 2";
 std::cout << "\nBenis = 3";
- std::cout << "\nAnswer = ";
+std::cout << "\nAnswer = ";
 
 std::cin >> shapeChoice;
 
-  while(ros::ok() && userInput!=0){
+if (shapeChoice != 3)
+{
+  std::cout << "\nYou chose wrong and got Penis anyway";
+  shapeChoice = 3;
+}
 
-
+while(ros::ok() && userInput!=0){
 
 switch (shapeChoice)
 {
@@ -163,7 +167,7 @@ default:
       count++;
     }
     */
-    std::cout << "continue (yes=1/no=0)? ";
+    std::cout << "\ncontinue (yes=1/no=0)? ";
     std::cin >> userInput;
 
 //    if (userInput){
