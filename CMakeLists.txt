@@ -11,6 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   geometry_msgs
   turtlesim
+  move_base_msgs 
+  actionlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -137,6 +139,7 @@ add_executable(vacuum src/vacuum.cpp)
 add_executable(move_turtle src/move_turtle.cpp)
 add_executable(draw_turtle src/draw_turtle.cpp)
 add_executable(sutden src/sutden.cpp)
+add_executable(avoid_obstacles src/avoid_obstacles.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -173,6 +176,9 @@ target_link_libraries(sutden
   ${catkin_LIBRARIES}
 )
 
+target_link_libraries(avoid_obstacles
+  ${catkin_LIBRARIES}
+)
 #############
 ## Install ##
 #############
@@ -189,7 +195,7 @@ target_link_libraries(sutden
 
 ## Mark executables for installation
 ## See http://docs.ros.org/melodic/api/catkin/html/howto/format1/building_executables.html
-install(TARGETS kill_turtles make_box vacuum move_turtle draw_turtle sutden
+install(TARGETS kill_turtles make_box vacuum move_turtle draw_turtle sutden avoid_obstacles
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
