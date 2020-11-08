@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+  <arg name="world" default="$(find gazeboWorlds/wow.world"/>
+
+  <include file="$(find turtlebot_gazebo)/launch/turtlebot_world.launch">
+    <arg name="world_file" value="$(arg world)"/>
+  </include>
+  <include file="$(find turtlebot_gazebo)/launch/gmapping_demo.launch" />
+</launch>
