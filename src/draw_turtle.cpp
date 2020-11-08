@@ -3,12 +3,11 @@
 #include <turtlesim/TeleportAbsolute.h>
 #include <turtlesim/SetPen.h>
 #include <iostream>
+#include <math.h>
 #include "stdlib.h"
 #include "time.h"
 
 int randomNumber(int maxN, int minN){
-    srand (time(NULL));
-
     int randomNumber = rand() % (maxN-minN+1) + minN;
 
     //ROS_INFO("Random number: %d", randomNumber);
@@ -30,6 +29,64 @@ void moveTurtle(float x, float y, ros::ServiceClient teleport_client, turtlesim:
   srv.request.y = y;
   teleport_client.call(srv);
 }
+void quicksort(float sortList[][2], float tmpLngth, int first, int last){
+int pivot, i, j, tmpX, tmpY;
+if (first<last){
+        pivot = first;
+        i= first;
+        j = last;
+        float distances[last];
+        float fullDistance = 0;
+        float calcDistance = 0;
+for(int i=0; i<last; i++){
+distances[i] = sqrt(pow(sortList[i][0]-sortList[i+1][0],2)+pow(sortList[i][1]-sortList[i+1][1],2)* 1.0);
+}
+        while(i<j) {
+            while (distances[i]<=distances[pivot] && i<last){
+                i++;
+            }
+            while (distances[j]>distances[pivot]){
+                j--;
+            }
+            if(i<j){
+                tmpX = sortList[i][0];
+                tmpY = sortList[i][1];
+                sortList[i][0] = sortList[j][0];
+                sortList[i][1] = sortList[j][1];
+                sortList[j][0] = tmpY;
+                sortList[j][1] = tmpY;
+
+                tmpX = distances[i];
+                distances[i] = distances[j];
+                distances[j] = tmpX;
+            }
+        }
+        tmpX = sortList[pivot][0];
+        tmpY = sortList[pivot][1];
+        sortList[pivot][0] = sortList[j][0];
+        sortList[pivot][1] = sortList[j][1];
+        sortList[j][0] = tmpX;
+        sortList[j][1] = tmpY;
+        
+        tmpX = distances[pivot];
+        distances[pivot] = distances[j];
+        distances[j] = tmpX;
+
+  std::cout << "\n distances after sort\n";
+  
+  for(int i=0; i<last+1; i++){
+    calcDistance =  fullDistance;
+    fullDistance = calcDistance + distances[i];
+  }
+  std::cout << "(" << fullDistance << ") ";
+
+  if(fullDistance >= tmpLngth)
+
+        quicksort(sortList, tmpLngth, first, j-1);
+        quicksort(sortList, tmpLngth, j+1, last);
+    }
+
+}
 
 int main(int argc, char *argv[]) {
   ros::init(argc, argv, "draw_turtle");
@@ -39,6 +96,7 @@ int main(int argc, char *argv[]) {
   turtlesim::TeleportAbsolute srv;
   ros::ServiceClient pen_client = nh.serviceClient<turtlesim::SetPen>("/turtle1/set_pen");
   turtlesim::SetPen pen_srv;
+  srand (time(NULL));
   ros::Rate loop_rate(2);
 
   float startX = 5.544445, startY = 5.544445;
@@ -50,108 +108,52 @@ int main(int argc, char *argv[]) {
   initTurtlePosition(startX, startY,teleport_client, pen_client, srv, pen_srv);
   loop_rate.sleep();
 
-  const int sizeCoordA = 5;
+  int sizeCoordA = 5;
+  std::cout << "Please type the desired amount of points in the Polygon: ";
+  std::cin >> sizeCoordA;
   const int sizeCoordB = 2;
-  int coordinatesX[sizeCoordA+1];
-  int coordinatesY[sizeCoordA+1];
+float coordinates[sizeCoordA][sizeCoordB];
 
 for(int i=0; i<sizeCoordA+1; i++){
-        coordinatesX[i] = randomNumber(10, 3);
-        ros::Duration(1.0).sleep();
-        coordinatesY[i] = randomNumber(10, 3);
-        ros::Duration(1.0).sleep();
+        coordinates[i][0] = randomNumber(10, 3);
+        coordinates[i][1] = randomNumber(10, 3);
     }
-std::sort(coordinatesX, coordinatesX + sizeCoordA);
-std::sort(coordinatesY, coordinatesY + sizeCoordA);
+//calculating the distance between each point in the array
+/*
+for(int i=0; i<sizeCoordA; i++){
+distances[i] = sqrt(pow(coordinates[i][0]-coordinates[i+1][0],2)+pow(coordinates[i][1]-coordinates[i+1][1],2)* 1.0);
+}
+*/
+  //////////////////////////////////
+
+  
+  //////////////////////////////////
+
+ //quicksort(coordinates, 0, sizeCoordA);
+
+  ///////////////////////////////////// 
+  
+  /////////////////////////////////////
+coordinates[sizeCoordA][0]=coordinates[0][0];
+coordinates[sizeCoordA][1]=coordinates[0][1];
+
+  std::cout << "\n Printed coordinates\n";
   for(int i=0; i<sizeCoordA+1; i++){
-std::cout << "(" << coordinatesX[i] << ", " << coordinatesY[i] << ") ";
+std::cout << "(" << coordinates[i][0] << ", " << coordinates[i][1] << ") ";
   }
 
-//for calculating the angle
-for(int i=0; i<sizeCoordA+1; i++){
-double x_distance = coordinatesX[i] - coordinatesX[i-1];
-double y_distance = coordinatesY[i] - coordinatesY[i-1];
-double header = atan2(y_distance, x_distance);
-double angular_difference = header * 180 / M_PI;
-
-ROS_INFO("\nAngle: %f", angular_difference);
-}
-    for(int i=0; i<sizeCoordA+2; i++){
+    for(int i=0; i<sizeCoordA+1; i++){
   if (i == 0)
   {
-  initTurtlePosition(coordinatesX[i], coordinatesY[i],teleport_client, pen_client, srv, pen_srv);
+  initTurtlePosition(coordinates[i][0], coordinates[i][1],teleport_client, pen_client, srv, pen_srv);
   loop_rate.sleep();
   }
-  
-  else if(i == sizeCoordA+1){
-    srv.request.x = coordinatesX[0];
-    srv.request.y = coordinatesY[0];
-    teleport_client.call(srv);
-    loop_rate.sleep();
-  }    
   else {
-    srv.request.x = coordinatesX[i];
-    srv.request.y = coordinatesY[i];
-    teleport_client.call(srv);
-    loop_rate.sleep();
-  }
-  }
-
-   /*
-       for(int i = 0; i < sizeCoordA; i++){
-      
-if(i == sizeCoordA-1){
-  ros::Rate loop_rate(2);
-  float randomX = startX;
-  float randomY = startY;
-  moveTurtle(randomX, randomY, teleport_client, srv);
-  loop_rate.sleep();
-}
-else {
-    int randomX = {randomNumber(10, 3)};
-    ros::Duration(1.0).sleep();
-    int randomY = {randomNumber(10, 3)};
-    moveTurtle(randomX, randomY, teleport_client, srv);
-    loop_rate.sleep();
-    }
-    */
-
-/* Exercise 2
-  pen_srv.request.off = true;
-  pen_client.call(pen_srv);
-  srv.request.x = startX;
-  srv.request.y = startY;
-  teleport_client.call(srv);
-  pen_srv.request.off = false;
-  pen_srv.request.width = 2;
-  pen_client.call(pen_srv);
-  loop_rate.sleep();
-
-  int sizeCoordA = 5;
-  int sizeCoordB = 2;
-  float coordinates[sizeCoordA][sizeCoordB] = {{startX+5, startY},{startX+5, startY+4},{startX+2, startY+4},{startX,startY+6},{startX, startY}};
-
-  for(int i=0; i<sizeCoordA; i++){
     srv.request.x = coordinates[i][0];
     srv.request.y = coordinates[i][1];
     teleport_client.call(srv);
     loop_rate.sleep();
   }
-
-  */
-
-/* Exercise 1
-  int sizeCoordA = 5;
-  int sizeCoordB = 2;
-  float startX = 5.544445, startY = 5.544445;
-  float coordinates[sizeCoordA][sizeCoordB] = {{startX+3, startY},{startX+3, startY+4},{startX-3, startY+4},{startX-3,startY},{startX, startY}};
-
-  for(int i=0; i<sizeCoordA; i++){
-    srv.request.x = coordinates[i][0];
-    srv.request.y = coordinates[i][1];
-    teleport_client.call(srv);
-    loop_rate.sleep();
   }
-*/
   return 0;
 }

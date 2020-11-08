@@ -21,7 +21,6 @@ goal.target_pose.pose.orientation.w = w;
 ac.sendGoal(goal);
 ROS_INFO("LET'S FUCKING GOOOOOOOOOO");
 ac.waitForResult();
-
 }
 
 
